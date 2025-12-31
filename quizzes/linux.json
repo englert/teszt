@@ -1,0 +1,38 @@
+
+[
+  {
+    "question": "Ki volt a Linux kernel eredeti megalkotója?",
+    "type": "text",
+    "answer": ["Linus Torvalds"],
+    "points": 1,
+    "match_type": "exact"
+  },
+  {
+    "question": "Melyik évben jelent meg a Linux kernel első nyilvános verziója?",
+    "type": "text",
+    "answer": ["1991"],
+    "points": 1,
+    "match_type": "number"
+  },
+  {
+    "question": "Milyen típusú szoftverlicenc alatt vált ismertté a Linux kernel, amely lehetővé teszi a szabad felhasználását és módosítását?",
+    "type": "text",
+    "answer": ["GPL"],
+    "points": 1,
+    "match_type": "contains"
+  },
+  {
+    "question": "Nevezzen meg egyet a 90-es évek végén és a 2000-es évek elején megjelent népszerű asztali környezetek közül, amelyek jelentősen hozzájárultak a Linux felhasználóbarátságához.",
+    "type": "text",
+    "answer": ["GNOME", "KDE"],
+    "points": 1,
+    "match_type": "contains"
+  },
+  {
+    "question": "Milyen területeken vált a Linux meghatározó operációs rendszerré napjainkban, különösen a szerverek és internetes infrastruktúra tekintetében?",
+    "type": "text",
+    "answer": ["szerver", "felhő"],
+    "points": 1,
+    "match_type": "contains"
+  }
+]

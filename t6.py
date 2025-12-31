@@ -94,7 +94,10 @@ def teacher_quiz_management():
         quiz_options = {qid: f"{data['name']} ({data['question_count']} kérdés)" 
                        for qid, data in available_quizzes.items()}
     
-    col1, col2 = st.columns([3, 1])
+
+
+    col1, col2, col3, col4 = st.columns([3, 1, 1, 2])
+    
     
     with col1:
         if 'teacher_selected_quiz' not in st.session_state:
@@ -128,6 +131,31 @@ def teacher_quiz_management():
             st.success(f"'{new_quiz_name}' quiz létrehozva!")
             st.session_state.teacher_selected_quiz = new_quiz_id
             st.rerun()
+
+    with col4:
+        css  = """
+            .st-key-ai {
+                background-color: #1d1d1d;
+                border-radius: 10px;
+                padding: 10px;
+            }
+
+        """
+        st.html(f"<style>{css}</style>")
+        with st.container(key="ai"):
+            st.html("""
+            <h1>Feladat generálása AI segítségével</h1>
+            <style></style>
+            """)
+            ai_task_name = st.text_input("Feladatsor neve", placeholder="Feladatsor neve", key="ai_task_name")
+            ai_topic_name = st.text_input("Téma neve", placeholder="Téma neve", key="ai_topic_name")
+            ai_teacher_desc = st.text_area("Egyéb paraméterek", placeholder="Egyéb paraméterek", key="ai_teacher_desc")
+            ai_num_of_task = st.text_input("Feladatok száma", placeholder="Feladatok száma", key="ai_num_of_task")
+            if st.button("AI álltal generált feladatsor") and ai_task_name and ai_num_of_task and ai_topic_name:
+                
+                conf = load_config()
+                gen_task(api_key=conf["api_key"], task_name=ai_task_name, task_topic=ai_topic_name, num_of_task=ai_num_of_task, ai_teacher_desc=ai_teacher_desc)
+    
     
     if not st.session_state.teacher_selected_quiz:
         st.info("Válassz ki egy quizt a listából, vagy hozz létre egy újat.")
@@ -147,7 +175,7 @@ def teacher_quiz_management():
     config = load_config()
     quiz_settings = config.get("quiz_settings", {}).get(selected_quiz_id, {})
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         show_correct_answers = st.checkbox(
@@ -541,6 +569,81 @@ def teacher_settings():
                 st.success(message)
             else:
                 st.error(message)
+
+    config = load_config()
+    st.header("AI Beállításai")
+    st.text("Hogyan szerezzek api kulcsot?")
+    if st.checkbox(label="API kulcs szerkesztése"):
+        if st.button("Fejlesztői jelszó", type="tertiary"):
+            st.toast(icon="💡", body="A fejlesztői jelszó megváltoztatható itt:```~/quiz_config.json```>```dev_passw```", duration='long')
+        check_container = st.empty()
+        
+        dev_passw = check_container.text_input("Jelszó", type="password")
+        if st.checkbox("Szerkesztés engedélyezése"):
+            if simple_hash(dev_passw) == config["dev_passw"]:
+                st.toast(icon="✅", body="#### ```Sikeres azonosítás```", duration=2)
+                check_container.empty()
+                api_key = st.text_input("Google API Key", value="..."+config["api_key"][-4:])
+                st.text("Hogyan szerezzek api kulcsot?: "); st.link_button("Google API kulcs létrehozása", "https://aistudio.google.com/api-keys")
+                if st.button("api kulcs mentése"):
+                    config["api_key"] = api_key
+                    save_config(config)
+                if st.button("API kulcs törlése"):
+                    config["api_key"] = "API kulcs"
+                    save_config(config)
+                    st.warning("API kulcs törölve.")
+            else:
+                st.toast(icon="❌", body="##### ```Sikertelen azonosítás```", duration=2)
+
+       
+    st.html("<hr>")
+    if st.checkbox(label="Részletes prompt"):
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([1, 0.5, 1, 1, 1, 1, 1])
+    
+        with col1:
+            resz1 = st.text_area("Részletes promt 1. része", value=config["prompt"]["resz1"])
+            if st.button("Első rész mentése"):
+                config["prompt"]["resz1"] = resz1
+                save_config(config)
+                st.success("A mentés sikeres")
+        with col2:
+            st.space()
+            st.subheader("témakör.")
+        with col3:
+            resz2 = st.text_area("Részletes promt 2. része", value=config["prompt"]["resz2"])
+            if st.button("Második rész mentése"):
+                config["prompt"]["resz2"] = resz2
+                save_config(config)
+                st.success("A mentés sikeres")
+        with col4:
+            st.space()
+            st.subheader("Feladatok száma.")
+        with col5:
+            resz3 = st.text_area("Részletes promt 3. része", value=config["prompt"]["resz3"], height=200)
+            if st.button("Harmadik rész mentése"):
+                config["prompt"]["resz3"] = resz3
+                save_config(config)
+                st.success("A mentés sikeres")
+        with col6:
+            st.space()
+            st.subheader("Tanár szövege.")
+        with col7:
+            resz4 = st.text_area("Részletes promt 4. része", value=config["prompt"]["resz4"], height=300)
+            if st.button("Negyedik rész mentése"):
+                config["prompt"]["resz4"] = resz4
+                save_config(config)
+                st.success("A mentés sikeres")
+    else:
+        prompt = st.text_area("Egyszerű prompt", value=config["prompt"]["resz4"])
+        if st.button("Mentés"):
+            config["prompt"]["resz4"] = prompt
+            save_config(config)
+            st.success("A mentés sikeres")
+    
+
+
+
 
 def teacher_interface():
     st.title("👨‍🏫 Tanári Felület")

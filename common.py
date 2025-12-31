@@ -23,11 +23,41 @@ QUIZZES_DIR = "quizzes"
 IMAGES_DIR = "quiz_images"
 STUDENTS_FILE = "students.json"
 
+
+def gen_task(api_key, task_name, task_topic, num_of_task, ai_teacher_desc):
+    from google import genai
+    config = load_config()
+
+    client = genai.Client(api_key=api_key)
+
+
+
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents="""Csinálj json formátumban egy feladatsort ilyen formában:
+        [
+            {
+                "question": "Oldd meg az egyenletet: 0.5x + 2 = 3x - 1",
+                "type": "text",
+                "answer": ["1.2"],
+                "points": 1,
+                "match_type": "number"
+            }
+        ]
+        ,"""+ f"{config["prompt"]["resz1"]}: "+ task_topic+f"{config["prompt"]["resz2"]}"+ num_of_task+ f"{config["prompt"]["resz3"]} "+ai_teacher_desc+f". {config["prompt"]["resz4"]}",
+    )
+    with open(f"quizzes/{task_name}.json", "w") as f:
+        f.write(response.text[7:-3])
+
 # Jelszó kezelés
 def hash_password(password):
     """Jelszó hash-elése"""
     salt = secrets.token_hex(16)
     return hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex() + ":" + salt
+
+def simple_hash(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_password(password, hashed):
     """Jelszó ellenőrzése"""
