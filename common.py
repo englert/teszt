@@ -45,7 +45,7 @@ def gen_task(api_key, task_name, task_topic, num_of_task, ai_teacher_desc):
                 "match_type": "number"
             }
         ]
-        ,"""+ f"{config["prompt"]["resz1"]}: "+ task_topic+f"{config["prompt"]["resz2"]}"+ num_of_task+ f"{config["prompt"]["resz3"]} "+ai_teacher_desc+f". {config["prompt"]["resz4"]}",
+        ,"""+ f"{config['prompt']['resz1']}: "+ task_topic+f"{config['prompt']['resz2']}"+ num_of_task+ f"{config['prompt']['resz3']} "+ai_teacher_desc+f". {config['prompt']['resz4']}",
     )
     with open(f"quizzes/{task_name}.json", "w") as f:
         f.write(response.text[7:-3])
